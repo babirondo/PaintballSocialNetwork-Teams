@@ -1,6 +1,6 @@
 <?php
 namespace raiz;
- 
+
 error_reporting(E_ALL ^ E_DEPRECATED ^E_NOTICE);
 class Globais{
 
@@ -17,6 +17,7 @@ class Globais{
 
         $servidor["bancodados_campeonato"] = "192.168.0.150";
         $servidor["bancodados_players"] = "192.168.0.150";
+        $servidor["bancodados_times"] = "192.168.0.150";
         $servidor["rabbitmq"] = "192.168.0.150";
         $servidor["images"] = "http://192.168.0.150:85";
 
@@ -26,10 +27,10 @@ class Globais{
 
             case("local");
                 $this->banco = "Postgres";
-                $this->localhost = $servidor["bancodados_players"];
+                $this->localhost = $servidor["bancodados_times"];
                 $this->username = "postgres";
                 $this->password = "postgres";
-                $this->db ="jogadores";
+                $this->db ="times";
             break;
 
         }
@@ -39,6 +40,7 @@ class Globais{
        	$config_parsed = json_decode($configuracoes_externas,true);
        	$this->config = $config_parsed;
 
+        $this->ProcurarJogadores = $servidor["players"]."/PaintballSocialNetwork-Players/SearchPlayers/"; //UNIT TEST
 
     }
 
