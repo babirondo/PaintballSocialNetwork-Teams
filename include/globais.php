@@ -14,6 +14,7 @@ class Globais{
         $servidor["autenticacao"] = "http://192.168.0.150:82";
         $servidor["players"] = "http://192.168.0.150:83";
         $servidor["campeonato"] = "http://192.168.0.150:81";
+        $servidor["times"] = "http://192.168.0.150:86";
 
         $servidor["bancodados_campeonato"] = "192.168.0.150";
         $servidor["bancodados_players"] = "192.168.0.150";
@@ -41,6 +42,7 @@ class Globais{
        	$this->config = $config_parsed;
 
         $this->ProcurarJogadores = $servidor["players"]."/PaintballSocialNetwork-Players/SearchPlayers/"; //UNIT TEST
+        $this->healthcheck = $servidor["times"]."/PaintballSocialNetwork-Teams/healthcheck/"; //UNIT TEST        
 
     }
 
