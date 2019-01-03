@@ -226,6 +226,8 @@ COPY public.times (id, "time", idowner, localtreino, treino_segunda, treino_terc
 129	test Novo Time1593	10		\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N		\N	\N
 130	dublin house	10		\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N		\N	\N
 131	dublin house	10		\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N		\N	\N
+132	test Novo Time1767	10		\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N		\N	\N
+133	test Novo Time1767	10		\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N		\N	\N
 \.
 
 
@@ -240,7 +242,7 @@ SELECT pg_catalog.setval('public.jogador_times_id_seq', 1, false);
 -- Name: times_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.times_id_seq', 131, true);
+SELECT pg_catalog.setval('public.times_id_seq', 133, true);
 
 
 --
