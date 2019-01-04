@@ -180,8 +180,7 @@ class Teams{
             $data =   array(	"resultado" =>  "SUCESSO" );
             $data["idtime"] = $this->con->dados["id"];
 
-            //  echo "<PRE>$sql</PRE>";
-            $this->con->executa($sql, 1);
+             
 
             return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
         }
