@@ -47,7 +47,10 @@ class Globais{
         $this->ProcurarTimes = $servidor["times"]."/PaintballSocialNetwork-Teams/SearchTeams/"; // UNIT TEST
         $this->CriarMeuTimeSalvar = $servidor["times"]."/PaintballSocialNetwork-Teams/:idjogadorlogado/Teams/";// UNIT TEST
         $this->MeusTimesRemoto = $servidor["times"]."/PaintballSocialNetwork-Teams/:idjogadorlogado/MySquads/"; //UNIT TEST
-        $this->jogadores_por_times = $servidor["players"]."/PaintballSocialNetwork-Players/Teams/Players/";  // UNIT TEST        
+        $this->jogadores_por_times = $servidor["players"]."/PaintballSocialNetwork-Players/Teams/Players/";  // UNIT TEST
+
+        $this->SaveTeamImage = $servidor["images"]."/PaintballSocialNetwork-Images/Teams/Analyze/Image/:idtime";
+        $this->GetTeamsImages = $servidor["images"]."/PaintballSocialNetwork-Images/Teams/";
 
 
     }

@@ -74,7 +74,23 @@ class Teams{
                 $data["procurando_coach"]  = $this->con->dados["procurando_coach"];
                 $data["qtde_jogadores"]  = 4;
                 $output["TIMES"][$this->con->dados["id"]] = $data;
+
+                $times_encontrados[$this->con->dados["id"]] = $this->con->dados["id"];
             }
+
+
+            $query_API = array();
+
+            $parameters['IDTIMES_ARRAY'] = $times_encontrados;
+            $query_API = $this->API->CallAPI("POST",   $this->Globais->GetTeamsImages  , json_encode($parameters)); //,'SEMPRE'
+
+
+            foreach ($query_API["hits"] as $imagem){
+              $output["TIMES"][  $imagem["IDTIME"] ]["logotime"] = $imagem["imagem"];
+
+            }
+
+
             return $response->withJson(array_merge($data_inicio, $output), 200)->withHeader('Content-Type', 'application/json');
         }
         else {
@@ -101,22 +117,41 @@ class Teams{
         $query_API = $this->API->CallAPI("POST",   $this->Globais->ProcurarJogadores  , json_encode($parameters));//,'SEMPRE'
         //var_dump($query_API);
 
-        if (is_array($query_API)){
+        if (is_array($query_API["TIMES"])){
             $comp = "OR id IN (".implode(",",$query_API["TIMES"]).")";
         }
 
         $sql = "SELECT * FROM times  WHERE (idowner = '".$args['idusuario']."' $comp ) ";
-        //echo $sql;
+        $data["debug"] =  $sql;
         $this->con->executa($sql);
 
         if ( $this->con->nrw > 0 ){
             $contador = 0;
-            $data =   array(	"resultado" =>  "SUCESSO" );
+            $data[	"resultado" ] =  "SUCESSO" ;
             while ($this->con->navega(0)){
                 $contador++;
                 $data["TIMES"][$this->con->dados["id"]]["time"] = $this->con->dados["time"];
-                $data["TIMES"][$this->con->dados["id"]]["logo"] = $this->con->dados["logotime"];
+                //$data["TIMES"][$this->con->dados["id"]]["logo"] = $this->con->dados["logotime"];
+
+                $times_encontrados[] = $this->con->dados["id"];
             }
+
+            $query_API = array();
+
+            $parameters['IDTIMES_ARRAY'] = $times_encontrados;
+            $query_API = $this->API->CallAPI("POST",   $this->Globais->GetTeamsImages  , json_encode($parameters)); //,'SEMPRE'
+
+
+            foreach ($query_API["hits"] as $imagem){
+              $data["TIMES"][  $imagem["IDTIME"] ]["logo"] = $imagem["imagem"];
+
+            }
+
+          //  var_dump($query_API);
+            //buscar fotos dos times
+
+
+
             return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
         }
         else {
@@ -151,19 +186,13 @@ class Teams{
                 ->withHeader('Content-type', 'application/json;charset=utf-8')
                 ->withJson($data);
         }
-        if ($jsonRAW["foto"]["tmp_name"]){
-            $fotoSalvar = "usar servico de imagens";// base64_encode(file_get_contents( $jsonRAW["foto"]["tmp_name"] ));
-            $sql_complemento = " 'data:".$jsonRAW["foto"]["type"].";base64,".$fotoSalvar."' ";
-        }
-        else
-            $sql_complemento = " null ";
 
         $sql = "INSERT INTO times (time , idowner, localtreino,
                                     nivelcompeticao, treino_segunda, treino_terca,
                                     treino_quarta, treino_quinta, treino_sexta,
                                     treino_sabado, treino_domingo, procurando_snake,
                                     procurando_snakecorner, procurando_backcenter, procurando_doritoscorner,
-                                    procurando_doritos , procurando_coach   , logotime
+                                    procurando_doritos , procurando_coach
                                     )
                 VALUES(
                                 '".$jsonRAW["time"]."', ".(($args["idusuario"])?$args["idusuario"]:"null").",'".$jsonRAW["localtreino"]."',
@@ -171,7 +200,7 @@ class Teams{
                                 ".(($jsonRAW["treino"]["Quarta"])? "'".$jsonRAW["treino"]["Quarta"]."'" :"null").",".(($jsonRAW["treino"]["Quinta"])? "'".$jsonRAW["treino"]["Quinta"]."'" :"null").",".(($jsonRAW["treino"]["Sexta"])? "'".$jsonRAW["treino"]["Sexta"]."'" :"null").",
                                 ".(($jsonRAW["treino"]["Sabado"])? "'".$jsonRAW["treino"]["Sabado"]."'" :"null").",".(($jsonRAW["treino"]["Domingo"])? "'".$jsonRAW["treino"]["Domingo"]."'" :"null").",".(($jsonRAW["procurando"]["Snake"])? "'".$jsonRAW["procurando"]["Snake"]."'" :"null").",
                                 ".(($jsonRAW["procurando"]["SnakeCorner"])? "'".$jsonRAW["procurando"]["SnakeCorner"]."'" :"null").",".(($jsonRAW["procurando"]["BackCenter"])? "'".$jsonRAW["procurando"]["BackCenter"]."'" :"null").",".(($jsonRAW["procurando"]["DoritosCorner"])? "'".$jsonRAW["procurando"]["DoritosCorner"]."'" :"null").",
-                                ".(($jsonRAW["procurando"]["Doritos"])? "'".$jsonRAW["procurando"]["Doritos"]."'" :"null").",".(($jsonRAW["procurando"]["Coach"])? "'".$jsonRAW["procurando"]["Coach"]."'" :"null").", $sql_complemento
+                                ".(($jsonRAW["procurando"]["Doritos"])? "'".$jsonRAW["procurando"]["Doritos"]."'" :"null").",".(($jsonRAW["procurando"]["Coach"])? "'".$jsonRAW["procurando"]["Coach"]."'" :"null")."
                  )
                 RETURNING id";
         //  echo "<PRE>$sql</PRE>";
@@ -180,7 +209,17 @@ class Teams{
             $data =   array(	"resultado" =>  "SUCESSO" );
             $data["idtime"] = $this->con->dados["id"];
 
-             
+
+            if ($jsonRAW["fotoSalvar"]){
+                $trans=null;$trans = array(":idtime" => $data["idtime"]  );
+                $salvar_imagem_payload["imagem"] = "data:".$jsonRAW["foto"]["type"].";base64,".$jsonRAW["fotoSalvar"];//"binario da foto";
+                $salvar_imagem_payload["TipoImagem"] = "Profile";
+                $query_API = $this->API->CallAPI("POST", strtr( $this->Globais->SaveTeamImage, $trans), json_encode($salvar_imagem_payload,1),'ERRO');
+            }
+
+
+
+
 
             return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
         }
@@ -216,12 +255,15 @@ class Teams{
                 ->withHeader('Content-type', 'application/json;charset=utf-8')
                 ->withJson($data);
         }
-        if ($jsonRAW["foto"]["tmp_name"] != null){
-            $fotoSalvar = base64_encode(file_get_contents( $jsonRAW["foto"]["tmp_name"] ));
-            $sql_complemento = " ,logotime = 'data:".$jsonRAW["foto"]["type"].";base64,".$fotoSalvar."' ";
+
+        if ($jsonRAW["fotoSalvar"]){
+            $trans=null;$trans = array(":idtime" => $jsonRAW["idtime"]  );
+            $salvar_imagem_payload["imagem"] = "data:".$jsonRAW["foto"]["type"].";base64,".$jsonRAW["fotoSalvar"];//"binario da foto";
+            $salvar_imagem_payload["TipoImagem"] = "Profile";
+            $query_API = $this->API->CallAPI("POST", strtr( $this->Globais->SaveTeamImage, $trans), json_encode($salvar_imagem_payload,1) );
         }
-        else
-            $sql_complemento = "   ";
+
+
         $sql = "UPDATE times SET
                       time = '".$jsonRAW["time"]."', localtreino = '".$jsonRAW["localtreino"]."', nivelcompeticao = '".$jsonRAW["nivelcompeticao"]."',
                       treino_segunda = ".(($jsonRAW["treino"]["Segunda"])? "'".$jsonRAW["treino"]["Segunda"]."'" :"null").",
