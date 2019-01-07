@@ -84,7 +84,8 @@ CREATE TABLE public.times (
     procurando_doritos character varying,
     nivelcompeticao character varying,
     procurando_coach character varying,
-    logotime character varying
+    logotime character varying,
+    status_imagem_profile character varying
 );
 
 
@@ -94,10 +95,11 @@ ALTER TABLE public.times OWNER TO postgres;
 -- Data for Name: times; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.times (id, "time", idowner, localtreino, treino_segunda, treino_terca, treino_quarta, treino_quinta, treino_sexta, treino_sabado, treino_domingo, procurando_snake, procurando_snakecorner, procurando_backcenter, procurando_doritoscorner, procurando_doritos, nivelcompeticao, procurando_coach, logotime) FROM stdin;
-172	Spider Man	10	D1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Semi	\N	\N
-173	Toy Story	46	Dublin	\N	\N	\N	Quinta	\N	\N	\N	\N	\N	BackCenter	\N	\N	d1	\N	\N
-171	Avenger	10	Dublin	\N	\N	\N	\N	\N	\N	Domingo	Snake	\N	\N	\N	\N	Pro	\N	\N
+COPY public.times (id, "time", idowner, localtreino, treino_segunda, treino_terca, treino_quarta, treino_quinta, treino_sexta, treino_sabado, treino_domingo, procurando_snake, procurando_snakecorner, procurando_backcenter, procurando_doritoscorner, procurando_doritos, nivelcompeticao, procurando_coach, logotime, status_imagem_profile) FROM stdin;
+172	Spider Man Aranha	10	D1	\N	\N	\N	Quinta	\N	\N	\N	\N	\N	BackCenter	\N	\N	Semi	\N	\N	Team-172-Profile-5c337b2c75cf1.jpg
+171	Avenger	10	Dublin	\N	\N	\N	\N	\N	\N	Domingo	Snake	\N	\N	\N	\N	Pro	\N	\N	Team-171-Profile-5c337c778d48c.jpg
+174	Time do Bruno	10		\N	\N	\N	Quinta	\N	\N	Domingo	\N	SnakeCorner	\N	\N	\N		\N	\N	Team-174-Profile-5c3382c590b83.jpg
+173	Toy Story	46	Dublin	\N	\N	\N	Quinta	\N	\N	\N	\N	\N	BackCenter	\N	\N	d1	\N	\N	Team-173-Profile-5c339d6699935.jpg
 \.
 
 
@@ -112,7 +114,7 @@ SELECT pg_catalog.setval('public.jogador_times_id_seq', 1, false);
 -- Name: times_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.times_id_seq', 173, true);
+SELECT pg_catalog.setval('public.times_id_seq', 174, true);
 
 
 --

@@ -57,7 +57,7 @@ class Teams{
                 $data["id"]  = $this->con->dados["id"];
                 $data["idowner"]  = $this->con->dados["idowner"];
                 $data["localtreino"]  = $this->con->dados["localtreino"];
-                $data["logotime"]  = $this->con->dados["logotime"];
+                $data["logo"]  = $this->con->dados["status_imagem_profile"];
                 $data["nivelcompeticao"]  = $this->con->dados["nivelcompeticao"];
                 $data["treino_segunda"]  = $this->con->dados["treino_segunda"];
                 $data["treino_terca"]  = $this->con->dados["treino_terca"];
@@ -78,7 +78,7 @@ class Teams{
                 $times_encontrados[$this->con->dados["id"]] = $this->con->dados["id"];
             }
 
-
+/*
             $query_API = array();
 
             $parameters['IDTIMES_ARRAY'] = $times_encontrados;
@@ -89,7 +89,7 @@ class Teams{
               $output["TIMES"][  $imagem["IDTIME"] ]["logotime"] = $imagem["imagem"];
 
             }
-
+*/
 
             return $response->withJson(array_merge($data_inicio, $output), 200)->withHeader('Content-Type', 'application/json');
         }
@@ -122,7 +122,7 @@ class Teams{
         }
 
         $sql = "SELECT * FROM times  WHERE (idowner = '".$args['idusuario']."' $comp ) ";
-        $data["debug"] =  $sql;
+      //  $data["debug"] =  $sql;
         $this->con->executa($sql);
 
         if ( $this->con->nrw > 0 ){
@@ -131,27 +131,24 @@ class Teams{
             while ($this->con->navega(0)){
                 $contador++;
                 $data["TIMES"][$this->con->dados["id"]]["time"] = $this->con->dados["time"];
-                //$data["TIMES"][$this->con->dados["id"]]["logo"] = $this->con->dados["logotime"];
+                $data["TIMES"][$this->con->dados["id"]]["logo"] = $this->con->dados["status_imagem_profile"];
 
                 $times_encontrados[] = $this->con->dados["id"];
             }
-
+/*
             $query_API = array();
 
             $parameters['IDTIMES_ARRAY'] = $times_encontrados;
             $query_API = $this->API->CallAPI("POST",   $this->Globais->GetTeamsImages  , json_encode($parameters)); //,'SEMPRE'
 
+            if (is_array($query_API["hits"])){
+              foreach ($query_API["hits"] as $imagem){
+                $data["TIMES"][  $imagem["IDTIME"] ]["logo"] = $imagem["imagem"];
 
-            foreach ($query_API["hits"] as $imagem){
-              $data["TIMES"][  $imagem["IDTIME"] ]["logo"] = $imagem["imagem"];
+              }
 
             }
-
-          //  var_dump($query_API);
-            //buscar fotos dos times
-
-
-
+*/
             return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
         }
         else {
@@ -192,7 +189,7 @@ class Teams{
                                     treino_quarta, treino_quinta, treino_sexta,
                                     treino_sabado, treino_domingo, procurando_snake,
                                     procurando_snakecorner, procurando_backcenter, procurando_doritoscorner,
-                                    procurando_doritos , procurando_coach
+                                    procurando_doritos , procurando_coach, status_imagem_profile
                                     )
                 VALUES(
                                 '".$jsonRAW["time"]."', ".(($args["idusuario"])?$args["idusuario"]:"null").",'".$jsonRAW["localtreino"]."',
@@ -200,7 +197,7 @@ class Teams{
                                 ".(($jsonRAW["treino"]["Quarta"])? "'".$jsonRAW["treino"]["Quarta"]."'" :"null").",".(($jsonRAW["treino"]["Quinta"])? "'".$jsonRAW["treino"]["Quinta"]."'" :"null").",".(($jsonRAW["treino"]["Sexta"])? "'".$jsonRAW["treino"]["Sexta"]."'" :"null").",
                                 ".(($jsonRAW["treino"]["Sabado"])? "'".$jsonRAW["treino"]["Sabado"]."'" :"null").",".(($jsonRAW["treino"]["Domingo"])? "'".$jsonRAW["treino"]["Domingo"]."'" :"null").",".(($jsonRAW["procurando"]["Snake"])? "'".$jsonRAW["procurando"]["Snake"]."'" :"null").",
                                 ".(($jsonRAW["procurando"]["SnakeCorner"])? "'".$jsonRAW["procurando"]["SnakeCorner"]."'" :"null").",".(($jsonRAW["procurando"]["BackCenter"])? "'".$jsonRAW["procurando"]["BackCenter"]."'" :"null").",".(($jsonRAW["procurando"]["DoritosCorner"])? "'".$jsonRAW["procurando"]["DoritosCorner"]."'" :"null").",
-                                ".(($jsonRAW["procurando"]["Doritos"])? "'".$jsonRAW["procurando"]["Doritos"]."'" :"null").",".(($jsonRAW["procurando"]["Coach"])? "'".$jsonRAW["procurando"]["Coach"]."'" :"null")."
+                                ".(($jsonRAW["procurando"]["Doritos"])? "'".$jsonRAW["procurando"]["Doritos"]."'" :"null").",".(($jsonRAW["procurando"]["Coach"])? "'".$jsonRAW["procurando"]["Coach"]."'" :"null").", '".(($jsonRAW["fotoSalvar"])?"processing":"")."'
                  )
                 RETURNING id";
         //  echo "<PRE>$sql</PRE>";
@@ -217,10 +214,6 @@ class Teams{
                 $query_API = $this->API->CallAPI("POST", strtr( $this->Globais->SaveTeamImage, $trans), json_encode($salvar_imagem_payload,1),'ERRO');
             }
 
-
-
-
-
             return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
         }
         else {
@@ -232,6 +225,9 @@ class Teams{
                 ->withJson($data);
         }
     }
+
+
+
     function Alterar_Time(  $request, $response, $args,   $jsonRAW){
         if (!$this->con->conectado){
             $data =   array(	"resultado" =>  "ERRO",
@@ -247,7 +243,7 @@ class Teams{
                 ->withHeader('Content-type', 'application/json;charset=utf-8')
                 ->withJson($data);
         }
-        //todo: checar se o campo inicio e fim eh date
+        /*
         if ( strlen(trim($jsonRAW["time"])) < 1 ){
             $data =  array(	"resultado" =>  "ERRO",
                 "erro" => "Time Invalido - ".var_export($jsonRAW, true) );
@@ -255,45 +251,86 @@ class Teams{
                 ->withHeader('Content-type', 'application/json;charset=utf-8')
                 ->withJson($data);
         }
+        */
 
+        //TODO: checar se o campo inicio e fim eh date
         if ($jsonRAW["fotoSalvar"]){
             $trans=null;$trans = array(":idtime" => $jsonRAW["idtime"]  );
             $salvar_imagem_payload["imagem"] = "data:".$jsonRAW["foto"]["type"].";base64,".$jsonRAW["fotoSalvar"];//"binario da foto";
             $salvar_imagem_payload["TipoImagem"] = "Profile";
             $query_API = $this->API->CallAPI("POST", strtr( $this->Globais->SaveTeamImage, $trans), json_encode($salvar_imagem_payload,1) );
-        }
 
-
-        $sql = "UPDATE times SET
-                      time = '".$jsonRAW["time"]."', localtreino = '".$jsonRAW["localtreino"]."', nivelcompeticao = '".$jsonRAW["nivelcompeticao"]."',
-                      treino_segunda = ".(($jsonRAW["treino"]["Segunda"])? "'".$jsonRAW["treino"]["Segunda"]."'" :"null").",
-                      treino_terca = ".(($jsonRAW["treino"]["Terca"])? "'".$jsonRAW["treino"]["Terca"]."'" :"null").",
-                      treino_quarta = ".(($jsonRAW["treino"]["Quarta"])? "'".$jsonRAW["treino"]["Quarta"]."'" :"null").",
-                      treino_quinta = ".(($jsonRAW["treino"]["Quinta"])? "'".$jsonRAW["treino"]["Quinta"]."'" :"null").",
-                      treino_sexta = ".(($jsonRAW["treino"]["Sexta"])? "'".$jsonRAW["treino"]["Sexta"]."'" :"null").",
-                      treino_sabado = ".(($jsonRAW["treino"]["Sabado"])? "'".$jsonRAW["treino"]["Sabado"]."'" :"null").",
-                      treino_domingo = ".(($jsonRAW["treino"]["Domingo"])? "'".$jsonRAW["treino"]["Domingo"]."'" :"null").",
-                      procurando_snake = ".(($jsonRAW["procurando"]["Snake"])? "'".$jsonRAW["procurando"]["Snake"]."'" :"null").",
-                      procurando_snakecorner = ".(($jsonRAW["procurando"]["SnakeCorner"])? "'".$jsonRAW["procurando"]["SnakeCorner"]."'" :"null").",
-                      procurando_backcenter = ".(($jsonRAW["procurando"]["BackCenter"])? "'".$jsonRAW["procurando"]["BackCenter"]."'" :"null").",
-                      procurando_doritos = ".(($jsonRAW["procurando"]["Doritos"])? "'".$jsonRAW["procurando"]["Doritos"]."'" :"null").",
-                      procurando_doritoscorner = ".(($jsonRAW["procurando"]["DoritosCorner"])? "'".$jsonRAW["procurando"]["DoritosCorner"]."'" :"null").",
-                      procurando_coach = ".(($jsonRAW["procurando"]["Coach"])? "'".$jsonRAW["procurando"]["Coach"]."'" :"null")."
-                      $sql_complemento
-                WHERE id = ".$jsonRAW["idtime"];
-    //echo $sql;
-        $this->con->executa($sql, 1);
-        if ( $this->con->res == 1 ){
-            $data =   array(	"resultado" =>  "SUCESSO" );
-            return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
+            $update_foto = "processing";
         }
         else {
-            // nao encontrado
-            $data =    array(	"resultado" =>  "ERRO",
-                "erro" => "Nao foi possivel alterar os dados");
-            return $response->withStatus(200)
-                ->withHeader('Content-type', 'application/json;charset=utf-8')
-                ->withJson($data);
+          $update_foto = null;
         }
+
+        if ($jsonRAW["time"])
+          $alterar_campos[] = "time = '".$jsonRAW["time"]."'";
+        if ($jsonRAW["localtreino"])
+          $alterar_campos[] = "localtreino = '".$jsonRAW["localtreino"]."'";
+        if ($jsonRAW["nivelcompeticao"])
+          $alterar_campos[] = "nivelcompeticao = '".$jsonRAW["nivelcompeticao"]."'";
+
+        if ($jsonRAW["treino"]["Segunda"])
+          $alterar_campos[] = "treino_segunda = '".$jsonRAW["treino"]["Segunda"]."'";
+        if ($jsonRAW["treino"]["Terca"])
+          $alterar_campos[] = "treino_terca = '".$jsonRAW["treino"]["Terca"]."'";
+        if ($jsonRAW["treino"]["Quarta"])
+          $alterar_campos[] = "treino_quarta = '".$jsonRAW["treino"]["Quarta"]."'";
+        if ($jsonRAW["treino"]["Quinta"])
+          $alterar_campos[] = "treino_quinta = '".$jsonRAW["treino"]["Quinta"]."'";
+        if ($jsonRAW["treino"]["Sexta"])
+          $alterar_campos[] = "treino_sexta = '".$jsonRAW["treino"]["Sexta"]."'";
+        if ($jsonRAW["treino"]["Sabado"])
+          $alterar_campos[] = "treino_sabado = '".$jsonRAW["treino"]["Sabado"]."'";
+        if ($jsonRAW["treino"]["Domingo"])
+          $alterar_campos[] = "treino_domingo = '".$jsonRAW["treino"]["Domingo"]."'";
+        if ($jsonRAW["procurando"]["Snake"])
+          $alterar_campos[] = "procurando_snake = '".$jsonRAW["procurando"]["Snake"]."'";
+        if ($jsonRAW["procurando"]["SnakeCorner"])
+          $alterar_campos[] = "procurando_snakecorner = '".$jsonRAW["procurando"]["SnakeCorner"]."'";
+        if ($jsonRAW["procurando"]["BackCenter"])
+          $alterar_campos[] = "procurando_backcenter = '".$jsonRAW["procurando"]["BackCenter"]."'";
+        if ($jsonRAW["procurando"]["Doritos"])
+          $alterar_campos[] = "procurando_doritos = '".$jsonRAW["procurando"]["Doritos"]."'";
+        if ($jsonRAW["procurando"]["DoritosCorner"])
+          $alterar_campos[] = "procurando_doritoscorner = '".$jsonRAW["procurando"]["DoritosCorner"]."'";
+        if ($jsonRAW["procurando"]["Coach"])
+          $alterar_campos[] = "procurando_coach = '".$jsonRAW["procurando"]["Coach"]."'";
+        if ($jsonRAW["statusProfileImage"] )
+          $alterar_campos[] = "status_imagem_profile = '".$jsonRAW["statusProfileImage"] ."'";
+        if ( $update_foto )
+          $alterar_campos[] = "status_imagem_profile = '".$update_foto ."'";
+
+          if (is_array($alterar_campos)){
+            $sql = "UPDATE times SET ".implode(",",$alterar_campos)." WHERE id = ".$jsonRAW["idtime"];
+            //echo $sql;exit;
+            $this->con->executa($sql, 1);
+
+            if ( $this->con->res == 1 ){
+                $data =   array(	"resultado" =>  "SUCESSO" );
+                return $response->withJson($data, 200)->withHeader('Content-Type', 'application/json');
+            }
+            else {
+                // nao encontrado
+                $data =    array(	"resultado" =>  "ERRO",
+                    "erro" => "Nao foi possivel alterar os dados");
+                return $response->withStatus(200)
+                    ->withHeader('Content-type', 'application/json;charset=utf-8')
+                    ->withJson($data);
+            }
+          }
+          else {
+              // nao encontrado
+              $data =    array(	"resultado" =>  "ERRO",
+                  "erro" => "Nothing to update");
+              return $response->withStatus(200)
+                  ->withHeader('Content-type', 'application/json;charset=utf-8')
+                  ->withJson($data);
+          }
+
+
     }
 }

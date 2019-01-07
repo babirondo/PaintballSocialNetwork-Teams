@@ -16,6 +16,17 @@ $container['renderer'] = new PhpRenderer("./templates");
 
 
 
+$app->post('/Team/ImageProcessed', function ($request, $response, $args)  use ($app )   {
+    require_once("include/class_Teams.php");
+
+    $cTeam = new Teams();
+    $retorno = $cTeam->Alterar_Time($request, $response, $args, $request->getParsedBody() );
+
+    return $retorno;
+}  );
+
+
+
 $app->get('/healthcheck/', function ($request, $response, $args)  use ($app )   {
     require_once("healthcheck/healthcheck.php");
 
