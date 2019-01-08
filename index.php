@@ -1,7 +1,7 @@
 <?php
 namespace raiz;
 //error_reporting(E_ALL ^ E_DEPRECATED);
-
+header('Access-Control-Allow-Origin: *');
 //ggggggggggggg
 use Slim\Views\PhpRenderer;
 

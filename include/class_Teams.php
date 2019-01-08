@@ -131,6 +131,7 @@ class Teams{
             while ($this->con->navega(0)){
                 $contador++;
                 $data["TIMES"][$this->con->dados["id"]]["time"] = $this->con->dados["time"];
+                $data["TIMES"][$this->con->dados["id"]]["owner"] = $this->con->dados["idowner"];
                 $data["TIMES"][$this->con->dados["id"]]["logo"] = $this->con->dados["status_imagem_profile"];
 
                 $times_encontrados[] = $this->con->dados["id"];
