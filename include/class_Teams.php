@@ -44,7 +44,7 @@ class Teams{
         if ($jsonRAW["procurando"]["DoritosCorner"]) $filtros[] = " procurando_doritoscorner ilike '%".$jsonRAW["procurando"]["DoritosCorner"]."%'";
         if ($jsonRAW["procurando"]["Coach"]) $filtros[] = " procurando_coach ilike '%".$jsonRAW["procurando"]["Coach"]."%'";
 
-        $sql = "SELECT * FROM times ".((is_array($filtros))?" WHERE ".implode( " or ",$filtros) :"") ;
+        $sql = "SELECT * FROM times ".((is_array($filtros))?" WHERE ".implode( " or ",$filtros) :""). " ORDER By status_imagem_profile DESC" ;
         $this->con->executa($sql);
 
         if ( $this->con->nrw > 0 ){
